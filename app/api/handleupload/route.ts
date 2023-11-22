@@ -11,11 +11,11 @@ import {
   import { readFile, writeFile } from "fs/promises";
   import { NextResponse } from "next/server";
   
-  export const config = {
-    api: {
-      bodyParser: false,
-    },
-  };
+  // export const config = {
+  //   api: {
+  //     bodyParser: false,
+  //   },
+  // };
   
    export async function  POST (req:any, res:any) {
    
