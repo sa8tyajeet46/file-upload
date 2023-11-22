@@ -186,18 +186,21 @@ import {
             console.log(err);
             await s3Client.send(abortCommand);
           }
+          fs.unlinkSync(path);
           return NextResponse.json({ok:false,message:"Internal server error"});
     
         }
-  
+        fs.unlinkSync(path);
             return NextResponse.json({ ok:true });
           } catch (error) {
             console.log(error);
+            
             return NextResponse.json({ok:false,message:"Internal server error"});
         }
       
        
       } else {
+        
           return NextResponse.json({ok:false,message:"Internal server error"});
       }
     
