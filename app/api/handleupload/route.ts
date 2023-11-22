@@ -5,16 +5,17 @@ import {
     CreateMultipartUploadCommand,
     S3Client,
     UploadPartCommand
-  } from "@aws-sdk/client-s3";
+  } from "@aws-sdk/client-s3"
+  import axios from "axios";
   import { fromCognitoIdentityPool } from "@aws-sdk/credential-providers";
   import fs from "fs"
   import { readFile, writeFile } from "fs/promises";
   import { NextResponse } from "next/server";
-  // import { PutObjectCommand } from "@aws-sdk/client-s3";
-  // import {
-  //   getSignedUrl,
-  //   S3RequestPresigner,
-  // } from "@aws-sdk/s3-request-presigner";
+  import { PutObjectCommand } from "@aws-sdk/client-s3";
+  import {
+    getSignedUrl,
+    S3RequestPresigner,
+  } from "@aws-sdk/s3-request-presigner";
   // import multer from "multer";
   // import  multerS3 from "multer-s3";
   // const upload = multer({
@@ -33,41 +34,62 @@ import {
   //     bodyParser: false,
   //   
   // };
-  // const createPresignedUrlWithClient = ( bucket:any, key :any) => {
-  //   const client = new S3Client({
-  //     region: "ap-south-1",
-  //     credentials: fromCognitoIdentityPool({
-  //       clientConfig: { region: "eu-north-1" },
-  //       identityPoolId: "eu-north-1:6882a53f-ea7c-49cb-b0b6-bea5052ec264",
+  const createPresignedUrlWithClient = ( bucket:any, key :any) => {
+    const client = new S3Client({
+      region: "ap-south-1",
+      credentials: fromCognitoIdentityPool({
+        clientConfig: { region: "eu-north-1" },
+        identityPoolId: "eu-north-1:6882a53f-ea7c-49cb-b0b6-bea5052ec264",
         
-  //     })
-  //   });
-  //   const command = new PutObjectCommand({ Bucket: bucket, Key: key });
-  //   return getSignedUrl(client, command, { expiresIn: 3600 });
-  // };
+      })
+    });
+    const command = new PutObjectCommand({ Bucket: bucket, Key: key });
+    return getSignedUrl(client, command, { expiresIn: 3600 });
+  };
   
-  // function put(url:any, data:any) {
-  //   return new Promise((resolve, reject) => {
-  //     const req = https.request(
-  //       url,
-  //       { method: "PUT", headers: { "Content-Length": new Blob([data]).size } },
-  //       (res) => {
-  //         let responseBody = "";
-  //         res.on("data", (chunk) => {
-  //           responseBody += chunk;
-  //         });
-  //         res.on("end", () => {
-  //           resolve(responseBody);
-  //         });
-  //       },
-  //     );
-  //     req.on("error", (err) => {
-  //       reject(err);
-  //     });
-  //     req.write(data);
-  //     req.end();
-  //   });
-  // }
+  function put(url:any, data:any) {
+    return new Promise((resolve, reject) => {
+      const req = https.request(
+        url,
+        { method: "PUT", headers: { "Content-Length": new Blob([data]).size } },
+        (res) => {
+          let responseBody = "";
+          res.on("data", (chunk) => {
+            responseBody += chunk;
+          });
+          res.on("end", () => {
+            resolve(responseBody);
+          });
+        },
+      );
+      req.on("error", (err) => {
+        reject(err);
+      });
+      req.write(data);
+      req.end();
+    });
+  }
+  function get(url:any) {
+    return new Promise((resolve, reject) => {
+      const req = https.get(url, (res) => {
+        let responseBody = '';
+  
+        res.on('data', (chunk) => {
+          responseBody += chunk;
+        });
+  
+        res.on('end', () => {
+          resolve(responseBody);
+        });
+      });
+  
+      req.on('error', (err) => {
+        reject(err);
+      });
+  
+      req.end();
+    });
+  }
    export async function  POST (req:any, res:any) {
    
     
@@ -79,29 +101,30 @@ import {
      
     const bytes = await tfile.arrayBuffer()
     const buffer = Buffer.from(bytes)
-  
+   
     // With the file data in the buffer, you can do whatever you want with it.
     // For this, we'll just write it to the filesystem in a new location
-    const path = `/tmp/${tfile.name}`
+    // const path = `/tmp/${tfile.name}`
    
-    await writeFile(path, buffer);
-    const file=await readFile(path);
+    // await writeFile(path, buffer);
+    // const file=await readFile(path);
     // const clientUrl = await createPresignedUrlWithClient(
     //   "theprintguy-customerfiles",`${tfile.name}`
     // );
-    // const file:any=await put(clientUrl, buffer);
+    // await put(clientUrl, buffer);
+    // const file:any=await get(clientUrl);
+    
+    if(!tfile)
+    {
+        return NextResponse.json({ok:false,message:"file not found"});
+    }
+              if(tfile.size>2*1024*1024*1024)
+    {
+        return NextResponse.json({ok:false,message:"maximum file size is upto 2 gb"});
+    }
 
-
-   //console.log(file);
   
-            if(!file)
-            {
-                return NextResponse.json({ok:false,message:"file not found"});
-            }
-                      if(tfile.size>2*1024*1024*1024)
-            {
-                return NextResponse.json({ok:false,message:"maximum file size is upto 2 gb"});
-            }
+         
             let key=`${Date.now()}+${tfile.name}`;
             const s3Client = new S3Client({
                 region: "ap-south-1",
@@ -128,7 +151,7 @@ import {
         uploadId = multipartUpload.UploadId;
     
         // const byteData=await file;
-        const buffer = Buffer.from(file);
+        // const buffer = Buffer.from(file);
         const uploadPromises = [];
         
         const partSize = 5*1024*1024;
@@ -186,11 +209,11 @@ import {
             console.log(err);
             await s3Client.send(abortCommand);
           }
-          fs.unlinkSync(path);
+         
           return NextResponse.json({ok:false,message:"Internal server error"});
     
         }
-        fs.unlinkSync(path);
+        
             return NextResponse.json({ ok:true });
           } catch (error) {
             console.log(error);
