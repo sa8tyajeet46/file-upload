@@ -1,4 +1,4 @@
-
+import https from "https";
 import {
     AbortMultipartUploadCommand,
     CompleteMultipartUploadCommand,
@@ -10,13 +10,64 @@ import {
   import fs from "fs"
   import { readFile, writeFile } from "fs/promises";
   import { NextResponse } from "next/server";
-  
+  // import { PutObjectCommand } from "@aws-sdk/client-s3";
+  // import {
+  //   getSignedUrl,
+  //   S3RequestPresigner,
+  // } from "@aws-sdk/s3-request-presigner";
+  // import multer from "multer";
+  // import  multerS3 from "multer-s3";
+  // const upload = multer({
+  //   storage: multerS3({
+  //     s3: s3,
+  //     bucket: 'YOUR_BUCKET_NAME',
+  //     acl: 'public-read',
+  //     contentType: multerS3.AUTO_CONTENT_TYPE,
+  //     key: function (req, file, cb) {
+  //       cb(null, Date.now().toString() + '-' + file.originalname);
+  //     }
+  //   })
+  // });
   // export const config = {
   //   api: {
   //     bodyParser: false,
-  //   },
+  //   
+  // };
+  // const createPresignedUrlWithClient = ( bucket:any, key :any) => {
+  //   const client = new S3Client({
+  //     region: "ap-south-1",
+  //     credentials: fromCognitoIdentityPool({
+  //       clientConfig: { region: "eu-north-1" },
+  //       identityPoolId: "eu-north-1:6882a53f-ea7c-49cb-b0b6-bea5052ec264",
+        
+  //     })
+  //   });
+  //   const command = new PutObjectCommand({ Bucket: bucket, Key: key });
+  //   return getSignedUrl(client, command, { expiresIn: 3600 });
   // };
   
+  // function put(url:any, data:any) {
+  //   return new Promise((resolve, reject) => {
+  //     const req = https.request(
+  //       url,
+  //       { method: "PUT", headers: { "Content-Length": new Blob([data]).size } },
+  //       (res) => {
+  //         let responseBody = "";
+  //         res.on("data", (chunk) => {
+  //           responseBody += chunk;
+  //         });
+  //         res.on("end", () => {
+  //           resolve(responseBody);
+  //         });
+  //       },
+  //     );
+  //     req.on("error", (err) => {
+  //       reject(err);
+  //     });
+  //     req.write(data);
+  //     req.end();
+  //   });
+  // }
    export async function  POST (req:any, res:any) {
    
     
@@ -25,18 +76,23 @@ import {
         const data = await req.formData();
     const tfile: File | null = data.get('file') as unknown as File;
    
+     
     const bytes = await tfile.arrayBuffer()
     const buffer = Buffer.from(bytes)
   
     // With the file data in the buffer, you can do whatever you want with it.
     // For this, we'll just write it to the filesystem in a new location
-    const path = `./tmp/${tfile.name}`
-    if (!fs.existsSync("./tmp")) {
-      fs.mkdirSync("./tmp");
-    }
+    const path = `/tmp/${tfile.name}`
+   
     await writeFile(path, buffer);
     const file=await readFile(path);
-  // console.log(file);
+    // const clientUrl = await createPresignedUrlWithClient(
+    //   "theprintguy-customerfiles",`${tfile.name}`
+    // );
+    // const file:any=await put(clientUrl, buffer);
+
+
+   //console.log(file);
   
             if(!file)
             {
