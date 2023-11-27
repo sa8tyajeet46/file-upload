@@ -1,11 +1,14 @@
-import Image from 'next/image'
 "use client"
+import createPresignedUrlWithClient from '../utils/use';
+import Image from 'next/image'
+
 import { ChangeEvent, useEffect, useState } from 'react';
 
 export default function Home() {
 
   const [file,setFile]= useState<File | undefined>(undefined);
   const [us,setUs]=useState("initial");
+  const [url,setUrl]=useState("");
   const [progress, setProgress] = useState(0);
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -21,18 +24,12 @@ export default function Home() {
       {
         return;
       }
-   
       const data = new FormData()
-       data.set('file', file);
-   
-       setUs("progress");
-    
-     const res = await fetch('/api/handleupload', {method:"POST",body:data});
-      console.log("done");
-      
-      setUs("initial");
+      data.set('file', file);
+   const temurl=await createPresignedUrlWithClient("theprintguy-customerfiles",data);
+   setUrl(temurl);
 
-      if (!res.ok) throw new Error();
+   
     }
     catch(e){
       setUs("failed");
@@ -40,6 +37,7 @@ export default function Home() {
       throw new Error();
     }
   }
+  console.log(url);
   return (
     <form onSubmit={(e)=>handleSubmit(e)}>
 

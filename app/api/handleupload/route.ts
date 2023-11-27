@@ -36,19 +36,7 @@ import {
   //     bodyParser: false,
   //   
   // };
-  const createPresignedUrlWithClient = ( bucket:any, key :any) => {
-    const client = new S3Client({
-      region: "ap-south-1",
-      
-      credentials: fromCognitoIdentityPool({
-        clientConfig: { region: "ap-south-1" },
-        identityPoolId: "eu-north-1:6882a53f-ea7c-49cb-b0b6-bea5052ec264",
-        
-      })
-    });
-    const command = new PutObjectCommand({ Bucket: bucket, Key: key });
-    return getSignedUrl(client, command, { expiresIn: 3600 });
-  };
+
   
   function put(url:any, data:any) {
     return new Promise((resolve, reject) => {
@@ -134,7 +122,7 @@ import {
             const s3Client = new S3Client({
                 region: "ap-south-1",
                 credentials: fromCognitoIdentityPool({
-                  clientConfig: { region: "eu-north-1" },
+                  clientConfig: { region: "eu-south-1" },
                   identityPoolId: "eu-north-1:6882a53f-ea7c-49cb-b0b6-bea5052ec264",
                   
                 }),  
