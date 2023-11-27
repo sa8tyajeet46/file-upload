@@ -6,6 +6,7 @@ import {
     S3Client,
     UploadPartCommand
   } from "@aws-sdk/client-s3"
+  import { json } from 'express';
   import axios from "axios";
   import { fromCognitoIdentityPool } from "@aws-sdk/credential-providers";
   import fs from "fs"
@@ -92,11 +93,12 @@ import {
     });
   }
 
-   export async function  POST (req:any, res:any) {
+   export async function  POST (req:any, res:any,next:any) {
    
     
       if (req.method === 'POST') {
         try{
+          await json({ limit: '1024mb' })(req, res,next);
         const data = await req.formData();
     const tfile: File | null = data.get('file') as unknown as File;
    
@@ -230,13 +232,13 @@ import {
       }
     
     };
-    export const config = {
-      api: {
-        bodyParser: {
-          sizeLimit: '1024mb', // Adjust the size limit as needed
-        },
-      },
-    };
+    // export const config = {
+    //   api: {
+    //     bodyParser: {
+    //       sizeLimit: '1024mb', // Adjust the size limit as needed
+    //     },
+    //   },
+    // };
   
   
   
