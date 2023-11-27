@@ -6,7 +6,7 @@ import {
     S3Client,
     UploadPartCommand
   } from "@aws-sdk/client-s3"
-  import { json } from 'express';
+ 
   import axios from "axios";
   import { fromCognitoIdentityPool } from "@aws-sdk/credential-providers";
   import fs from "fs"
@@ -19,7 +19,8 @@ import {
   } from "@aws-sdk/s3-request-presigner";
   // import multer from "multer";
   // import  multerS3 from "multer-s3";
-  // const upload = multer({
+  // import { json } from 'express';
+// const upload = multer({
   //   storage: multerS3({
   //     s3: s3,
   //     bucket: 'YOUR_BUCKET_NAME',
@@ -92,13 +93,17 @@ import {
       req.end();
     });
   }
-
+  export const config = {
+    api: {
+      responseLimit: false,
+    },
+  }
    export async function  POST (req:any, res:any,next:any) {
    
     
       if (req.method === 'POST') {
         try{
-          await json({ limit: '1024mb' })(req, res,next);
+         
         const data = await req.formData();
     const tfile: File | null = data.get('file') as unknown as File;
    
