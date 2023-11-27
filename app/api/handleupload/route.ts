@@ -93,11 +93,7 @@ import {
       req.end();
     });
   }
-  export const config = {
-    api: {
-      responseLimit: false,
-    },
-  }
+
    export async function  POST (req:any, res:any,next:any) {
    
     
