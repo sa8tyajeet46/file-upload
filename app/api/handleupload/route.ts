@@ -92,11 +92,12 @@ import {
     });
   }
   export const config = {
-      api: {
-        bodyParser: false,
-      
-    }
-  }
+    api: {
+      bodyParser: {
+        sizeLimit: '1024mb', // Adjust the size limit as needed
+      },
+    },
+  };
    export async function  POST (req:any, res:any) {
    
     
