@@ -37,8 +37,9 @@ import {
   const createPresignedUrlWithClient = ( bucket:any, key :any) => {
     const client = new S3Client({
       region: "ap-south-1",
+      
       credentials: fromCognitoIdentityPool({
-        clientConfig: { region: "eu-north-1" },
+        clientConfig: { region: "ap-south-1" },
         identityPoolId: "eu-north-1:6882a53f-ea7c-49cb-b0b6-bea5052ec264",
         
       })
@@ -89,6 +90,12 @@ import {
   
       req.end();
     });
+  }
+  export const config = {
+      api: {
+        bodyParser: false,
+      
+    }
   }
    export async function  POST (req:any, res:any) {
    
