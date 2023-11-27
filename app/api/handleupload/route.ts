@@ -91,13 +91,7 @@ import {
       req.end();
     });
   }
-  export const config = {
-    api: {
-      bodyParser: {
-        sizeLimit: '1024mb', // Adjust the size limit as needed
-      },
-    },
-  };
+
    export async function  POST (req:any, res:any) {
    
     
@@ -235,6 +229,13 @@ import {
           return NextResponse.json({ok:false,message:"Internal server error"});
       }
     
+    };
+    export const config = {
+      api: {
+        bodyParser: {
+          sizeLimit: '1024mb', // Adjust the size limit as needed
+        },
+      },
     };
   
   
